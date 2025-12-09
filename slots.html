@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lucky Slots · 爆有钱风格试玩</title>
+  <style>
+    :root {
+      --bg: #0b0c10;
+      --panel: #161925;
+      --accent: #ffcc00;
+      --muted: #9aa2b2;
+      --win: #2ec27e;
+      --warn: #e46c6c;
+      --text: #eef2ff;
+      --border: #2a3042;
+      font-family: "Inter", "Helvetica Neue", Arial, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: radial-gradient(circle at 20% 20%, rgba(255, 204, 0, 0.07), transparent 30%), radial-gradient(circle at 80% 10%, rgba(46, 194, 126, 0.08), transparent 35%), var(--bg);
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 32px 16px;
+    }
+
+    .app {
+      width: min(1080px, 100%);
+      background: rgba(15, 17, 25, 0.9);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 24px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 28px;
+      letter-spacing: 0.5px;
+    }
+
+    header p {
+      margin: 4px 0 0;
+      color: var(--muted);
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    .status {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .stat-card {
+      padding: 12px 14px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: var(--panel);
+    }
+
+    .stat-card small {
+      display: block;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    .stat-card strong {
+      font-size: 22px;
+      color: var(--accent);
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      margin-bottom: 16px;
+    }
+
+    .controls label {
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 600;
+    }
+
+    .controls input[type="number"] {
+      width: 90px;
+      padding: 8px 10px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: #0f121d;
+      color: var(--text);
+    }
+
+    button {
+      padding: 10px 16px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: linear-gradient(135deg, #ffcc00, #ff9f1c);
+      color: #1b1b1b;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 80ms ease, box-shadow 120ms ease;
+    }
+
+    button:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+      box-shadow: none;
+      transform: none;
+    }
+
+    button:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 18px rgba(255, 204, 0, 0.25);
+    }
+
+    .message {
+      flex: 1;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .message[data-tone="win"] {
+      color: var(--win);
+    }
+
+    .message[data-tone="warn"] {
+      color: var(--warn);
+    }
+
+    .machine {
+      display: grid;
+      grid-template-columns: 1fr 260px;
+      gap: 16px;
+      align-items: stretch;
+      flex-wrap: wrap;
+    }
+
+    @media (max-width: 900px) {
+      .machine {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .reels {
+      background: linear-gradient(145deg, #10131f, #0a0d18);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 16px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.02);
+    }
+
+    .reel {
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.03), transparent 60%);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 10px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .cell {
+      aspect-ratio: 1 / 1;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: #0f121d;
+      display: grid;
+      place-items: center;
+      font-size: 32px;
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.03);
+    }
+
+    .paytable {
+      background: var(--panel);
+      border-radius: 18px;
+      border: 1px solid var(--border);
+      padding: 16px;
+    }
+
+    .paytable h2 {
+      margin: 0 0 12px;
+      font-size: 18px;
+    }
+
+    .paytable ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      gap: 8px;
+    }
+
+    .paytable li {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 10px;
+      background: #0f121d;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+    }
+
+    .note {
+      color: var(--muted);
+      margin-top: 10px;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header>
+      <div>
+        <h1>Lucky Slots</h1>
+        <p><span lang="zh">轻量试玩版，3×3 转轴，包含横列、斜线、竖线 8 条赔付线，风格参考「爆有钱」小游戏。</span> <span lang="en">Simple 3×3 slot demo with eight paylines.</span></p>
+      </div>
+    </header>
+
+    <section class="status">
+      <div class="stat-card">
+        <small>账户余额</small>
+        <strong id="balance">1000</strong> <span class="muted">金币</span>
+      </div>
+      <div class="stat-card">
+        <small>上次赢取</small>
+        <strong id="last-win">0</strong>
+      </div>
+      <div class="stat-card">
+        <small>当前下注</small>
+        <strong id="current-bet">20</strong>
+      </div>
+    </section>
+
+    <section class="controls">
+      <label>
+        每次下注
+        <input type="number" id="bet" min="5" max="200" step="5" value="20">
+      </label>
+      <button id="spin-btn">开始旋转</button>
+      <button id="auto-btn">自动 10 次</button>
+      <span class="message" id="message" aria-live="polite">祝你好运！</span>
+    </section>
+
+    <section class="machine">
+      <div class="reels" aria-label="老虎机转轴">
+        <div class="reel">
+          <div class="cell"></div>
+          <div class="cell"></div>
+          <div class="cell"></div>
+        </div>
+        <div class="reel">
+          <div class="cell"></div>
+          <div class="cell"></div>
+          <div class="cell"></div>
+        </div>
+        <div class="reel">
+          <div class="cell"></div>
+          <div class="cell"></div>
+          <div class="cell"></div>
+        </div>
+      </div>
+      <aside class="paytable">
+        <h2>赔率表（3 个连线）</h2>
+        <ul>
+          <li><span>💎 宝石</span><span>×12</span></li>
+          <li><span>7️⃣ 幸运 7</span><span>×10</span></li>
+          <li><span>⭐ 星星</span><span>×8</span></li>
+          <li><span>🔔 铃铛</span><span>×6</span></li>
+          <li><span>🍋 柠檬</span><span>×4</span></li>
+          <li><span>🍒 樱桃</span><span>×3</span></li>
+        </ul>
+        <p class="note">赔付线：3 条横线、2 条对角线、3 条竖线，共 8 条。每条线满足 3 连即获得下注金额乘以对应倍数的奖励。</p>
+      </aside>
+    </section>
+  </main>
+
+  <script>
+    (() => {
+      const symbols = [
+        { icon: "🍒", label: "樱桃", multiplier: 3 },
+        { icon: "🍋", label: "柠檬", multiplier: 4 },
+        { icon: "🔔", label: "铃铛", multiplier: 6 },
+        { icon: "⭐", label: "星星", multiplier: 8 },
+        { icon: "7️⃣", label: "幸运 7", multiplier: 10 },
+        { icon: "💎", label: "宝石", multiplier: 12 }
+      ];
+
+      const paylines = [
+        [0, 1, 2],
+        [3, 4, 5],
+        [6, 7, 8],
+        [0, 4, 8],
+        [2, 4, 6],
+        [0, 3, 6],
+        [1, 4, 7],
+        [2, 5, 8]
+      ];
+
+      const cells = Array.from(document.querySelectorAll(".cell"));
+      const balanceEl = document.querySelector("#balance");
+      const lastWinEl = document.querySelector("#last-win");
+      const betInput = document.querySelector("#bet");
+      const spinBtn = document.querySelector("#spin-btn");
+      const autoBtn = document.querySelector("#auto-btn");
+      const message = document.querySelector("#message");
+      const currentBet = document.querySelector("#current-bet");
+
+      let balance = 1000;
+      let lastWin = 0;
+      let isSpinning = false;
+      const localeCandidates = [document.documentElement.lang, navigator.language]
+        .map((value) => value && value.trim())
+        .filter(Boolean);
+      const resolvedLocale =
+        localeCandidates.find(
+          (locale) => Intl.NumberFormat.supportedLocalesOf([locale]).length > 0
+        ) || "zh-CN";
+      const SPIN_TICKS = 14;
+      const AUTO_DELAY_MS = 280;
+      const SPIN_TICK_MS = 90;
+      const AUTO_SPIN_COUNT = 10;
+      const lineLabel = resolvedLocale.startsWith("zh") ? "线" : "Line";
+
+      const clampBet = (value) => {
+        const min = Number(betInput.min);
+        const max = Number(betInput.max);
+        const next = Math.min(Math.max(value, min), max);
+        betInput.value = String(next);
+        currentBet.textContent = String(next);
+        return next;
+      };
+
+      const formatCredits = (value) => value.toLocaleString(resolvedLocale);
+
+      const showMessage = (text, tone = "info") => {
+        message.textContent = text;
+        message.dataset.tone = tone;
+      };
+
+      const updateHud = () => {
+        balanceEl.textContent = formatCredits(balance);
+        lastWinEl.textContent = formatCredits(lastWin);
+        currentBet.textContent = betInput.value;
+      };
+
+      const pickSymbol = () => symbols[Math.floor(Math.random() * symbols.length)];
+
+      const drawBoard = (board) => {
+        board.forEach((symbol, index) => {
+          cells[index].textContent = symbol.icon;
+          cells[index].setAttribute("aria-label", symbol.label);
+        });
+      };
+
+      const generateBoard = () => Array.from({ length: 9 }, pickSymbol);
+
+      const evaluateBoard = (board, bet) => {
+        let total = 0;
+        const hits = [];
+
+        paylines.forEach((line, idx) => {
+          const [a, b, c] = line.map((i) => board[i]);
+          if (a === b && b === c) {
+            const win = bet * a.multiplier;
+            total += win;
+            const hitMessage = resolvedLocale.startsWith("zh")
+              ? `${lineLabel} ${idx + 1}：${a.icon} ×${a.multiplier}，赢得 ${win}`
+              : `${lineLabel} ${idx + 1}: ${a.icon} x${a.multiplier}, win ${win}`;
+            hits.push(hitMessage);
+          }
+        });
+
+        return { total, hits };
+      };
+
+      const spinAnimation = () =>
+        new Promise((resolve) => {
+          let ticks = 0;
+          let board = generateBoard();
+          const interval = setInterval(() => {
+            board = generateBoard();
+            drawBoard(board);
+            ticks += 1;
+            if (ticks >= SPIN_TICKS) {
+              clearInterval(interval);
+              resolve(board);
+            }
+          }, SPIN_TICK_MS);
+        });
+
+      const spinOnce = async (keepAutoLocked = false) => {
+        if (isSpinning) return false;
+        const bet = clampBet(Number(betInput.value) || 0);
+        if (bet > balance) {
+          showMessage("余额不足，请降低下注或充值金币。", "warn");
+          return false;
+        }
+
+        isSpinning = true;
+        spinBtn.disabled = true;
+        if (!keepAutoLocked) {
+          autoBtn.disabled = true;
+        }
+
+        balance -= bet;
+        updateHud();
+        showMessage("转轴旋转中...", "info");
+
+        const finalBoard = await spinAnimation();
+        const { total, hits } = evaluateBoard(finalBoard, bet);
+        balance += total;
+        lastWin = total;
+        updateHud();
+
+        if (total > 0) {
+          showMessage(`中奖 ${total} 金币！${hits.join(" | ")}`, "win");
+        } else {
+          showMessage("这把没中，再接再厉！", "info");
+        }
+
+        isSpinning = false;
+        spinBtn.disabled = false;
+        if (!keepAutoLocked) {
+          autoBtn.disabled = false;
+        }
+        return true;
+      };
+
+      const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+      const runAuto = async () => {
+        autoBtn.disabled = true;
+        for (let i = 0; i < AUTO_SPIN_COUNT; i += 1) {
+          const ok = await spinOnce(true);
+          if (!ok || balance < Number(betInput.value)) {
+            showMessage("自动停止：余额不足或已手动中断。", "warn");
+            break;
+          }
+          await delay(AUTO_DELAY_MS);
+        }
+        autoBtn.disabled = false;
+      };
+
+      betInput.addEventListener("change", () => clampBet(Number(betInput.value) || 0));
+      spinBtn.addEventListener("click", () => spinOnce());
+      autoBtn.addEventListener("click", () => runAuto());
+
+      // 初始渲染
+      const initialBoard = generateBoard();
+      drawBoard(initialBoard);
+      updateHud();
+    })();
+  </script>
+</body>
+</html>
